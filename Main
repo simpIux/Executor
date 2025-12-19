@@ -1,0 +1,294 @@
+local UserInputService = game:GetService("UserInputService")
+local Player = game:GetService("Players").LocalPlayer
+
+local ROOT_FOLDER = "simplux"
+if makefolder and isfolder and not isfolder(ROOT_FOLDER) then
+    makefolder(ROOT_FOLDER)
+end
+
+local TargetParent = (gethui and gethui()) or game:GetService("CoreGui")
+if TargetParent:FindFirstChild("InGameExecutor") then
+    TargetParent.InGameExecutor:Destroy()
+end
+
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "InGameExecutor"
+ScreenGui.DisplayOrder = 9999
+ScreenGui.Parent = TargetParent
+
+local Executor = Instance.new("Frame")
+Executor.Name = "Executor"
+Executor.Size = UDim2.new(0, 650, 0, 350)
+Executor.Position = UDim2.new(0.5, -325, 0.4, -175)
+Executor.BackgroundColor3 = Color3.fromRGB(24, 24, 24)
+Executor.BorderSizePixel = 0
+Executor.Active = true
+Executor.Parent = ScreenGui
+
+local headerBar = Instance.new("Frame")
+headerBar.Size = UDim2.new(1, 0, 0, 30)
+headerBar.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+headerBar.BorderSizePixel = 0
+headerBar.Parent = Executor
+
+local favicon = Instance.new("ImageLabel")
+favicon.Size = UDim2.new(0, 20, 0, 20)
+favicon.Position = UDim2.new(0, 5, 0, 5)
+favicon.BackgroundTransparency = 1
+favicon.Image = "rbxassetid://5639840603"
+favicon.Parent = headerBar
+
+local versionTitle = Instance.new("TextLabel")
+versionTitle.Size = UDim2.new(0, 300, 1, 0)
+versionTitle.Position = UDim2.new(0, 30, 0, 0)
+versionTitle.BackgroundTransparency = 1
+versionTitle.Text = "Simplux's In-Game Executor v1.3.6"
+versionTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
+versionTitle.TextXAlignment = Enum.TextXAlignment.Left
+versionTitle.Font = Enum.Font.SourceSans
+versionTitle.TextSize = 14
+versionTitle.Parent = headerBar
+
+local Close = Instance.new("TextButton")
+Close.Size = UDim2.new(0, 30, 0, 30)
+Close.Position = UDim2.new(1, -30, 0, 0)
+Close.BackgroundTransparency = 1
+Close.Text = "X"
+Close.TextColor3 = Color3.fromRGB(255, 255, 255)
+Close.Parent = headerBar
+
+local TabBar = Instance.new("ScrollingFrame")
+TabBar.Size = UDim2.new(1, 0, 0, 25)
+TabBar.Position = UDim2.new(0, 0, 0, 30)
+TabBar.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+TabBar.BorderSizePixel = 0
+TabBar.ScrollBarThickness = 0
+TabBar.CanvasSize = UDim2.new(2, 0, 0, 0) 
+
+TabBar.Parent = Executor
+
+local TabListLayout = Instance.new("UIListLayout")
+TabListLayout.FillDirection = Enum.FillDirection.Horizontal
+TabListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+TabListLayout.Parent = TabBar
+
+local AddTabBtn = Instance.new("TextButton")
+AddTabBtn.Size = UDim2.new(0, 25, 1, 0)
+AddTabBtn.LayoutOrder = 9999
+AddTabBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+AddTabBtn.Text = "+"
+AddTabBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+AddTabBtn.Parent = TabBar
+
+local ContentArea = Instance.new("Frame")
+ContentArea.Size = UDim2.new(1, 0, 1, -95)
+ContentArea.Position = UDim2.new(0, 0, 0, 55)
+ContentArea.BackgroundTransparency = 1
+ContentArea.Parent = Executor
+
+local EditorScroll = Instance.new("ScrollingFrame")
+EditorScroll.Size = UDim2.new(1, -120, 1, 0)
+EditorScroll.BackgroundColor3 = Color3.fromRGB(33, 33, 33)
+EditorScroll.BorderSizePixel = 0
+EditorScroll.ScrollBarThickness = 6
+EditorScroll.Parent = ContentArea
+
+local linesBar = Instance.new("Frame")
+linesBar.Size = UDim2.new(0, 32, 1, 0)
+linesBar.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+linesBar.BorderSizePixel = 0
+linesBar.Parent = EditorScroll
+
+local LineNumbers = Instance.new("TextLabel")
+LineNumbers.Size = UDim2.new(1, 0, 0, 0)
+LineNumbers.AutomaticSize = Enum.AutomaticSize.Y
+LineNumbers.BackgroundTransparency = 1
+LineNumbers.Text = "1"
+LineNumbers.TextColor3 = Color3.fromRGB(150, 150, 150)
+LineNumbers.TextYAlignment = Enum.TextYAlignment.Top
+LineNumbers.Font = Enum.Font.Code
+LineNumbers.TextSize = 14
+LineNumbers.Parent = linesBar
+
+local scriptEditor = Instance.new("TextBox")
+scriptEditor.Size = UDim2.new(1, -35, 0, 0)
+scriptEditor.AutomaticSize = Enum.AutomaticSize.Y
+scriptEditor.Position = UDim2.new(0, 35, 0, 0)
+scriptEditor.BackgroundTransparency = 1
+scriptEditor.Text = ""
+scriptEditor.TextColor3 = Color3.fromRGB(255, 255, 255)
+scriptEditor.ClearTextOnFocus = false
+scriptEditor.MultiLine = true
+scriptEditor.TextXAlignment = Enum.TextXAlignment.Left
+scriptEditor.TextYAlignment = Enum.TextYAlignment.Top
+scriptEditor.Font = Enum.Font.Code
+scriptEditor.TextSize = 14
+scriptEditor.Parent = EditorScroll
+
+local SavedScriptsBar = Instance.new("Frame")
+SavedScriptsBar.Size = UDim2.new(0, 120, 1, 0)
+SavedScriptsBar.Position = UDim2.new(1, -120, 0, 0)
+SavedScriptsBar.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+SavedScriptsBar.Parent = ContentArea
+
+local ScriptListScroll = Instance.new("ScrollingFrame")
+ScriptListScroll.Size = UDim2.new(1, 0, 1, 0)
+ScriptListScroll.BackgroundTransparency = 1
+ScriptListScroll.ScrollBarThickness = 4
+ScriptListScroll.Parent = SavedScriptsBar
+
+Instance.new("UIListLayout", ScriptListScroll).Padding = UDim.new(0, 2)
+
+local buttonBar = Instance.new("Frame")
+buttonBar.Size = UDim2.new(1, 0, 0, 40)
+buttonBar.Position = UDim2.new(0, 0, 1, -40)
+buttonBar.BackgroundColor3 = Color3.fromRGB(36, 36, 36)
+buttonBar.BorderSizePixel = 0
+buttonBar.Parent = Executor
+
+local FooterLayout = Instance.new("UIListLayout")
+FooterLayout.FillDirection = Enum.FillDirection.Horizontal
+FooterLayout.Padding = UDim.new(0, 15)
+FooterLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+FooterLayout.Parent = buttonBar
+
+Instance.new("UIPadding", buttonBar).PaddingLeft = UDim.new(0, 10)
+
+local function createBtn(text)
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(0, 90, 0, 28)
+    btn.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+    btn.BorderSizePixel = 0
+    btn.Text = text
+    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    btn.Font = Enum.Font.SourceSans
+    btn.TextSize = 14
+    btn.Parent = buttonBar
+    return btn
+end
+
+local ExecuteBtn = createBtn("Execute")
+local SaveFileBtn = createBtn("Save File")
+local OpenFileBtn = createBtn("Open File")
+local ClearBtn = createBtn("Clear")
+local RefreshBtn = createBtn("Refresh")
+
+-- LOGIC ---
+---
+--
+
+local function updateEditor()
+    local _, count = scriptEditor.Text:gsub("\n", "\n")
+    local numStr = ""
+    for i = 1, count + 1 do numStr = numStr .. i .. "\n" end
+    LineNumbers.Text = numStr
+    EditorScroll.CanvasSize = UDim2.new(0, 0, 0, scriptEditor.TextBounds.Y + 20)
+end
+scriptEditor:GetPropertyChangedSignal("Text"):Connect(updateEditor)
+
+local Tabs = {}
+local currentTab = nil
+local TabCount = 0
+
+local function SwitchTab(tabData)
+    if currentTab then 
+        currentTab.Content = scriptEditor.Text 
+        currentTab.Button.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+        currentTab.Button.TextColor3 = Color3.fromRGB(200, 200, 200)
+    end
+    currentTab = tabData
+    scriptEditor.Text = tabData.Content
+    currentTab.Button.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+    currentTab.Button.TextColor3 = Color3.fromRGB(255, 255, 255)
+    updateEditor()
+end
+
+local function CreateTab(name)
+    TabCount = TabCount + 1
+    local tabData = {Name = name or "Script " .. TabCount, Content = ""}
+
+    local btn = Instance.new("TextButton")
+    btn.Parent = TabBar 
+
+    btn.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    btn.BorderSizePixel = 0
+    btn.Text = tabData.Name
+    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    btn.Font = Enum.Font.SourceSans
+    btn.TextSize = 14
+
+    btn.Size = UDim2.new(0, 100, 1, 0) 
+
+    task.spawn(function()
+        task.wait()
+        local width = math.clamp(btn.TextBounds.X + 25, 60, 200)
+        btn.Size = UDim2.new(0, width, 1, 0)
+    end)
+
+    btn.MouseButton1Click:Connect(function()
+        SwitchTab(tabData)
+    end)
+
+    tabData.Button = btn
+    table.insert(Tabs, tabData)
+    SwitchTab(tabData)
+end
+
+local selectedFile = nil
+local function refreshFiles()
+    for _, v in pairs(ScriptListScroll:GetChildren()) do if v:IsA("TextButton") then v:Destroy() end end
+    if listfiles then
+        local files = listfiles(ROOT_FOLDER)
+        for _, file in pairs(files) do
+            local btn = Instance.new("TextButton")
+            btn.Size = UDim2.new(1, 0, 0, 22)
+            btn.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+            btn.Text = file:match("([^/]+)$")
+            btn.TextColor3 = Color3.fromRGB(200, 200, 200)
+            btn.Parent = ScriptListScroll
+            btn.MouseButton1Click:Connect(function()
+                selectedFile = file
+                for _, b in pairs(ScriptListScroll:GetChildren()) do if b:IsA("TextButton") then b.BackgroundColor3 = Color3.fromRGB(30, 30, 30) end end
+                btn.BackgroundColor3 = Color3.fromRGB(45, 45, 45) 
+            end)
+        end
+    end
+end
+
+ExecuteBtn.MouseButton1Click:Connect(function() 
+    local func, err = loadstring(scriptEditor.Text)
+    if func then task.spawn(func) else warn(err) end
+end)
+
+ClearBtn.MouseButton1Click:Connect(function() scriptEditor.Text = "" end)
+RefreshBtn.MouseButton1Click:Connect(refreshFiles)
+AddTabBtn.MouseButton1Click:Connect(function() CreateTab() end)
+Close.MouseButton1Click:Connect(function() ScreenGui:Destroy() end)
+
+SaveFileBtn.MouseButton1Click:Connect(function()
+    if writefile then
+        writefile(ROOT_FOLDER .. "/" .. currentTab.Name .. ".lua", scriptEditor.Text)
+        refreshFiles()
+    end
+end)
+
+OpenFileBtn.MouseButton1Click:Connect(function()
+    if selectedFile and readfile then scriptEditor.Text = readfile(selectedFile) end
+end)
+
+local dragging, dragStart, startPos
+headerBar.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = true dragStart = input.Position startPos = Executor.Position
+    end
+end)
+UserInputService.InputChanged:Connect(function(input)
+    if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+        local delta = input.Position - dragStart
+        Executor.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
+end)
+UserInputService.InputEnded:Connect(function(input) if input.UserInputType == Enum.UserInputType.MouseButton1 then dragging = false end end)
+
+CreateTab("Main")
+refreshFiles()
