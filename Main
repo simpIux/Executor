@@ -292,3 +292,9 @@ UserInputService.InputEnded:Connect(function(input) if input.UserInputType == En
 
 CreateTab("Main")
 refreshFiles()
+
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+    if not gameProcessed and input.KeyCode == Enum.KeyCode.Insert then
+        Executor.Visible = not Executor.Visible
+    end
+end)
